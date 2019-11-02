@@ -1,0 +1,36 @@
+import re
+
+from pathlib import Path
+
+class CorpusReader:
+    def __init__(self, train):
+        file = open(train, 'rb')
+        file_string_byte = file.read()
+        file_string = file_string_byte.decode('utf-8')
+        tokens = file_string.split("\n")
+        self.corpus = []
+        for token in tokens:
+            paragh = ParaghData(token.rstrip())
+            self.corpus.append(paragh)
+
+        print(self.corpus)
+        #print(tokens[9])
+
+
+
+class ParaghData:
+    def __init__(self, paragh):
+        splitted = re.split(r'\t+', paragh)
+        self.hm1 = {}
+        self.hm2 = {}
+        self.hm1["sent"] = splitted[1]
+        self.hm2["sent"] = splitted[2]
+        self.score = 0
+        self.id = splitted[0]
+        print(splitted)
+
+
+if __name__ == "__main__":
+    #objec = ParaghData("hi\thello\tnamaste")
+    data_folder = Path("data/train-set.txt")
+    corpusObject = CorpusReader(data_folder)
