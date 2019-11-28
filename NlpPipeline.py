@@ -92,9 +92,14 @@ if __name__ == "__main__":
 
     extractFeatures = ExtractFeatures()
     #longestSubsequence in a number
-    (extractFeatures.LongestSubsequence("hi hello how are you", "hi there"))
+    print(extractFeatures.longestSubsequence("hi hello how are you", "hi there"))
 
-    
+    #jaccard distance calcuation
+    #keep in mind the input is 'set of words'
+    print(extractFeatures.jaccardDistance(set(word_tokenize("hi there")),set(word_tokenize("hi there"))))
+
+    #lavenshtein distance
+    print(extractFeatures.lavenshteinDistance("hi hello how are you", "hi there"))
 
     syns = wn.synsets("the")
     #print(syns)
