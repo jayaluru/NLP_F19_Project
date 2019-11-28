@@ -107,6 +107,10 @@ if __name__ == "__main__":
     sent1 = "The kitchen is taller than buildings."
     print(word_tokenize(sent))
     print(pos_tag(word_tokenize(sent)))
+    print(set(pos_tag(word_tokenize(sent))))
+    print(set(pos_tag(word_tokenize(sent1))))
+    #extractFeatures.posOverlapJaccard(set(pos_tag(word_tokenize(sent))),set(pos_tag(word_tokenize(sent))), 'n')
+    print(extractFeatures.posFeatures(sent, sent1))
     print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'The','s'))
     print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))
 
