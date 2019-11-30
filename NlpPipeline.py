@@ -1,11 +1,12 @@
 import spacy
 from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk
-
+import re
 from nltk import word_tokenize
 from nltk import pos_tag
 from pathlib import Path
 from CorpusReader import CorpusReader
+from MachineLearningTasks import MachineLearningTasks
 from ExtractFeatures import ExtractFeatures
 from spacy.lang.en import English
 
@@ -90,7 +91,7 @@ class NlpPipeline:
 if __name__ == "__main__":
     print("starting now...")
 
-    extractFeatures = ExtractFeatures()
+    """extractFeatures = ExtractFeatures()
     #longestSubsequence in a number
     print(extractFeatures.longestSubsequence("hi hello how are you", "hi there"))
 
@@ -110,9 +111,10 @@ if __name__ == "__main__":
     print(set(pos_tag(word_tokenize(sent))))
     print(set(pos_tag(word_tokenize(sent1))))
     #extractFeatures.posOverlapJaccard(set(pos_tag(word_tokenize(sent))),set(pos_tag(word_tokenize(sent))), 'n')
-    print(extractFeatures.posFeatures(sent, sent1))
+    print(extractFeatures.posFeatures(sent, sent1))"""
     print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'The','s'))
     print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))
+
 
 
 
@@ -146,6 +148,15 @@ if __name__ == "__main__":
     nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
+    sentTest = "Once converted, BayStar will own an aggregate of approximately 2.95 million shares of SCO common stock or 17.5 percent of the company's outstanding shares."
+    sentTest = re.sub(r'["\']', '', sentTest)
+    print(sentTest)
+    sentTest1 = "John said he is going home"
+    sentTest2 = "John said I am going to home"
+
+    nlpPipeLine.createDepParse(nlp, sentTest)
+    nlpPipeLine.createDepParse(nlp, sentTest1)
+    nlpPipeLine.createDepParse(nlp, sentTest2)
     """sentTest = "TA user input sentence"
     print('-printing all tokens-')
     nlpPipeLine.createTokens(nlp,sentTest)
@@ -162,13 +173,20 @@ if __name__ == "__main__":
     #'lemmas' have antonyms
     #'synsets' have hypernyms, hyponyms, meornyms
 
-    data_folder = Path("data/train-set.txt")
-    corpusObject = CorpusReader(data_folder)
+    data_folder_train = Path("data/train-set.txt")
+    trainCorpusObject = CorpusReader(data_folder_train)
+
+    #data_folder_test = Path("data/test-set.txt")
+    #testCorpusObject = CorpusReader(data_folder_train)
+
+    testCorpusObject = None
+
+    mlObject = MachineLearningTasks(trainCorpusObject, testCorpusObject)
 
     #do the nlp pipeline for each parah in corpusObject
     #store in the appropriate HashMap dict
-    a = 0
-    for corpusParah in corpusObject.corpus:
+    """a = 0
+    for corpusParah in trainCorpusObject.corpus:
         #doc1 = nlp(corpusParah.hm1["sent"])
         #doc2 = nlp(corpusParah.hm2["sent"])
         if(a==2):
@@ -187,9 +205,9 @@ if __name__ == "__main__":
 
         #corpusParah.hm1["doc"] = doc1
         #corpusParah.hm2["doc"] = doc2
-        a = a+1
+        a = a+1"""
 
-    corpusParah1 = corpusObject.corpus[0]
+    """corpusParah1 = corpusObject.corpus[0]
     print(corpusParah1.hm1["sent"])
     doc1 = corpusParah1.hm1["hyper"]
     doc2 = corpusParah1.hm1["hypo"]
@@ -199,7 +217,7 @@ if __name__ == "__main__":
     print(doc1)
     print(doc2)
     print(doc3)
-    print(doc4)
+    print(doc4)"""
 
     """corpusParah1 = corpusObject.corpus[0]
 

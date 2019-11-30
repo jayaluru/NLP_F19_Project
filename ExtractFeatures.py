@@ -34,6 +34,9 @@ class ExtractFeatures:
             return -1
         return dist.jaccard_distance(stringSet1, stringSet2)
 
+    def jaccardSimilarity(self, string1, string2):
+        return self.jaccardDistance(set(word_tokenize(string1)), set(word_tokenize(string2)))
+
     def lavenshteinDistance(self, string1, string2):
         return dist.edit_distance(string1, string2, substitution_cost=1, transpositions=True)
     
@@ -59,7 +62,7 @@ class ExtractFeatures:
                 if (self.wordnet_tag_map[val[1]] == pos):
                     newStringSet2.add(val[0])
 
-        print(newStringSet1)
-        print(newStringSet2)
+        #print(newStringSet1)
+        #print(newStringSet2)
         return self.jaccardDistance(newStringSet1, newStringSet2)
 

@@ -14,6 +14,7 @@ class CorpusReader:
 
 class ParaghData:
     def __init__(self, paragh):
+        paragh = re.sub(r'["\']', '', paragh)
         splitted = re.split(r'\t+', paragh)
         self.hm1 = {}
         self.hm2 = {}
