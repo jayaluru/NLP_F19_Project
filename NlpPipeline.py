@@ -145,7 +145,7 @@ if __name__ == "__main__":
     #TA testing tokenize, lemma, pos, dep-parse 
     #this following needs to be uncommented
      
-    nlpPipeLine = NlpPipeline()
+    """nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
     sentTest = "Once converted, BayStar will own an aggregate of approximately 2.95 million shares of SCO common stock or 17.5 percent of the company's outstanding shares."
@@ -156,7 +156,8 @@ if __name__ == "__main__":
 
     nlpPipeLine.createDepParse(nlp, sentTest)
     nlpPipeLine.createDepParse(nlp, sentTest1)
-    nlpPipeLine.createDepParse(nlp, sentTest2)
+    nlpPipeLine.createDepParse(nlp, sentTest2)"""
+
     """sentTest = "TA user input sentence"
     print('-printing all tokens-')
     nlpPipeLine.createTokens(nlp,sentTest)
@@ -177,11 +178,11 @@ if __name__ == "__main__":
     trainCorpusObject = CorpusReader(data_folder_train)
 
     data_folder_test = Path("data/dev-set.txt")
-    testCorpusObject = CorpusReader(data_folder_test)
+    devCorpusObject = CorpusReader(data_folder_test)
 
     #testCorpusObject = None
 
-    mlObject = MachineLearningTasks(trainCorpusObject, testCorpusObject)
+    mlObject = MachineLearningTasks(trainCorpusObject, devCorpusObject)
 
     #do the nlp pipeline for each parah in corpusObject
     #store in the appropriate HashMap dict
