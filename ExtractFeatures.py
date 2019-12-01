@@ -26,7 +26,8 @@ class ExtractFeatures:
 
     def longestSubsequence(self, string1, string2):
         s = difflib.SequenceMatcher(isjunk=None, a=string1, b=string2)
-        return (s.find_longest_match(0,len(string1),0,len(string2))[2])
+        temp = (s.find_longest_match(0,len(string1),0,len(string2))[2])
+        return temp/(len(string1)+len(string2))
 
     def jaccardDistance(self, stringSet1, stringSet2):
         #dist.jaccard_distance()
@@ -38,7 +39,8 @@ class ExtractFeatures:
         return self.jaccardDistance(set(word_tokenize(string1)), set(word_tokenize(string2)))
 
     def lavenshteinDistance(self, string1, string2):
-        return dist.edit_distance(string1, string2, substitution_cost=1, transpositions=True)
+        temp = dist.edit_distance(string1, string2, substitution_cost=1, transpositions=True)
+        return temp / (len(string1) + len(string2))
     
     def posFeatures(self, string1, string2):
         stringSet1 = set(pos_tag(word_tokenize(string1)))

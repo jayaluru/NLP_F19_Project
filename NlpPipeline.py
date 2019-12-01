@@ -176,10 +176,10 @@ if __name__ == "__main__":
     data_folder_train = Path("data/train-set.txt")
     trainCorpusObject = CorpusReader(data_folder_train)
 
-    #data_folder_test = Path("data/test-set.txt")
-    #testCorpusObject = CorpusReader(data_folder_train)
+    data_folder_test = Path("data/dev-set.txt")
+    testCorpusObject = CorpusReader(data_folder_test)
 
-    testCorpusObject = None
+    #testCorpusObject = None
 
     mlObject = MachineLearningTasks(trainCorpusObject, testCorpusObject)
 
