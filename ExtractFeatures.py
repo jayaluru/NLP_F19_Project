@@ -3,6 +3,12 @@ import spacy
 import nltk as dist
 from nltk import word_tokenize
 from nltk import pos_tag
+from nltk.corpus import stopwords
+import sklearn.metrics.pairwise as sk
+import numpy as np
+from collections import Counter
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class ExtractFeatures:
@@ -73,6 +79,20 @@ class ExtractFeatures:
         #print(newStringSet1)
         #print(newStringSet2)
         return self.jaccardDistance(newStringSet1, newStringSet2)
+
+    #code is imported from 'https://towardsdatascience.com/overview-of-text-similarity-metrics-3397c4601f50'
+    def cosineSimilarities(self, *strs):
+        vectors = [t for t in self.get_vectors(*strs)]
+        out = 1.0
+        for val in cosine_similarity(vectors)[0]:
+            out = out * val
+        return out
+
+    def get_vectors(self, *strs):
+        text = [t for t in strs]
+        vectorizer = CountVectorizer(text)
+        vectorizer.fit(text)
+        return vectorizer.transform(text).toarray()
 
     def spacySimilarities(self, corpusObject):
         print('doing spacySimilarities')

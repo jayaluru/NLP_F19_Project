@@ -92,6 +92,10 @@ if __name__ == "__main__":
     print("starting now...")
 
     """extractFeatures = ExtractFeatures()
+
+    #cosine similarities
+    print(extractFeatures.get_cosine_sim("hi hello how are you", "hi there"))
+
     #longestSubsequence in a number
     print(extractFeatures.longestSubsequence("hi hello how are you", "hi there"))
 
@@ -111,9 +115,9 @@ if __name__ == "__main__":
     print(set(pos_tag(word_tokenize(sent))))
     print(set(pos_tag(word_tokenize(sent1))))
     #extractFeatures.posOverlapJaccard(set(pos_tag(word_tokenize(sent))),set(pos_tag(word_tokenize(sent))), 'n')
-    print(extractFeatures.posFeatures(sent, sent1))"""
+    print(extractFeatures.posFeatures(sent, sent1))
     print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'The','s'))
-    print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))
+    print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))"""
 
 
 
@@ -181,6 +185,8 @@ if __name__ == "__main__":
     devCorpusObject = CorpusReader(data_folder_test)
 
     #testCorpusObject = None
+
+    #0.8875103391232424 dev - train
 
     mlObject = MachineLearningTasks(trainCorpusObject, devCorpusObject)
 

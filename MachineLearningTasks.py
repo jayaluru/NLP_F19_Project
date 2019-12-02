@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 from ExtractFeatures import ExtractFeatures as ef
 from sklearn.ensemble import RandomForestClassifier as rf
+from random import randint
 
 
 class MachineLearningTasks:
@@ -26,15 +27,22 @@ class MachineLearningTasks:
         devRel = []
         index = 0
         sum = 0
+        sum2 = 0
+        print("Original-Projected")
         for corpusParah in devCorpusObject.corpus:
-            sum = sum + abs(int(corpusParah.score) - int(devVal[index]))
+            rd = randint(1,5)
+            sum = sum + abs(float(corpusParah.score) - float(devVal[index]))
+            sum2 = sum2 + abs(float(corpusParah.score) - float(rd))
+            print(corpusParah.score + " " + devVal[index] + " " + str(rd))
             index = index + 1
 
         print(sum/1209)
+        print(sum2/1209)
 
 
     def createDF(self, corpusObject):
-        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist'])
+        #df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist'])
+        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'cs'])
         index = 0
         efObject = ef()
         lemmaDist, nsubjDist, pobjDist, dobjDist = efObject.spacySimilarities(corpusObject)
@@ -45,9 +53,10 @@ class MachineLearningTasks:
             ls = efObject.longestSubsequence(sent1, sent2)
             js = efObject.jaccardSimilarity(sent1, sent2)
             ld = efObject.lavenshteinDistance(sent1, sent2)
+            cs = efObject.cosineSimilarities(sent1, sent2)
             npos, vpos, apos, rpos = efObject.posFeatures(sent1, sent2)
-            #lemmaDist, nsubjDist = efObject.spacySimilarities(sent1, sent2)
-            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index]]
+            #df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index]]
+            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], cs]
             index = index + 1
         print(df.head())
         return df
