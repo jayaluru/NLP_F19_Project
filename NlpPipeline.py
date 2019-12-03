@@ -1,63 +1,256 @@
 import spacy
+from nltk.corpus import wordnet as wn
+from nltk.wsd import lesk
+import re
+from nltk import word_tokenize
+from nltk import pos_tag
 from pathlib import Path
 from CorpusReader import CorpusReader
+from MachineLearningTasks import MachineLearningTasks
+from ExtractFeatures import ExtractFeatures
 from spacy.lang.en import English
 
 
 
 class NlpPipeline:
-    def _init_(self):
-        print("Hi")
 
+    wordnet_tag_map = {
+        'NN': 'n',
+        'NNS': 'n',
+        'NNP': 'n',
+        'NNPS': 'n',
+        'JJ': 'a',
+        'JJR': 'a',
+        'JJS': 'a',
+        'RB': 'r',
+        'RBR': 'r',
+        'RBS': 'r',
+        'VB': 'v',
+        'VBD': 'v',
+        'VBG': 'v',
+        'VBN': 'v',
+        'VBP': 'v',
+        'VBZ': 'v'
+    }
 
-    def createTokens(self,tokenizer,sentence):
-        tokens = tokenizer(sentence)
+    def createTokens(self,nlp,sentence):
+        doc = nlp(sentence)
+        for token in doc:
+            print(token.text)
 
-    def createDepParse(self,nlpdep,sentence):
-        doc = nlpdep(sentence)
+    def createLemma(self,nlp,sentence):
+        doc = nlp(sentence)
+        for token in doc:
+            print(token.text,token.lemma_)
+
+    def createPOS(self,nlp,sentence):
+        doc = nlp(sentence)
+        for token in doc:
+            print(token.text, token.pos_)
+
+    def createDepParse(self,nlp,sentence):
+        doc = nlp(sentence)
         for token in doc:
             print(token.text, token.dep_, token.head.text, token.head.pos_,
                   [child for child in token.children])
 
-    def createLemma(self,nlpdep,sentence):
-        doc = nlpdep(sentence)
-        for token in doc:
-            print(token.text,token.lemma_)
+    def createAllNyms(self,sentence):
+        wordTokens = word_tokenize(sentence)
+        pos = pos_tag(wordTokens)
 
-    def createPOS(self,nlpdep,sentence):
-        doc = nlpdep(sentence)
-        for token in doc:
-            print(token.text, token.pos_)
+        hyper = {}
+        hypo = {}
+        mero = {}
+        holo = {}
+
+        index = 0
+        for tokenOrig in wordTokens:
+            #print(tokenOrig)
+            if(pos[index][1] in self.wordnet_tag_map):
+                token = lesk(wordTokens, tokenOrig, self.wordnet_tag_map[pos[index][1]])
+            else:
+                token = lesk(wordTokens, tokenOrig)
+            index = index+1
+            #print(token)-
+            hyper[token] = []
+            hypo[token] = []
+            mero[token] = []
+            holo[token] = []
+            if (token):
+                if token.hypernyms():
+                    hyper[token] = token.hypernyms()
+                if token.hyponyms():
+                    hypo[token] = token.hyponyms()
+                mero[token] = token.part_meronyms()
+                holo[token] = token.part_holonyms()
+
+        return hyper, hypo, mero, holo
 
 
 
 if __name__ == "__main__":
+    print("starting now...")
 
-    print("hello")
-    nlpPipeLine = NlpPipeline()
+    file = open("data/prediction.txt", 'w')
+    file.write("id	Gold Tag\n")
+    linenum = 0
+    index =0
+    for x in range(90):
+        # rd = randint(1,5)
+        # sum = sum + abs(float(corpusParah.score) - float(devVal[index]))
+        # sum2 = sum2 + abs(float(corpusParah.score) - float(rd))
+        # print(corpusParah.score + " " + devVal[index])
+        newLine = "s_" + str(linenum) + " " + str(index)
+        file.write(newLine+"\n")
+        linenum = linenum + 1
+        index = index + 1
+        #print("hi")
+    file.close()
+    """extractFeatures = ExtractFeatures()
 
-    data_folder = Path("data/train-set.txt")
-    corpusObject = CorpusReader(data_folder)
+    #cosine similarities
+    print(extractFeatures.get_cosine_sim("hi hello how are you", "hi there"))
+
+    #longestSubsequence in a number
+    print(extractFeatures.longestSubsequence("hi hello how are you", "hi there"))
+
+    #jaccard distance calcuation
+    #keep in mind the input is 'set of words'
+    print(extractFeatures.jaccardDistance(set(word_tokenize("hi there")),set(word_tokenize("hi there"))))
+
+    #lavenshtein distance
+    print(extractFeatures.lavenshteinDistance("hi hello how are you", "hi there"))
+
+    syns = wn.synsets("the")
+    #print(syns)
+    sent = "the striped bats are hanging on their feet"
+    sent1 = "The kitchen is taller than buildings."
+    print(word_tokenize(sent))
+    print(pos_tag(word_tokenize(sent)))
+    print(set(pos_tag(word_tokenize(sent))))
+    print(set(pos_tag(word_tokenize(sent1))))
+    #extractFeatures.posOverlapJaccard(set(pos_tag(word_tokenize(sent))),set(pos_tag(word_tokenize(sent))), 'n')
+    print(extractFeatures.posFeatures(sent, sent1))
+    print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'The','s'))
+    print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))"""
 
 
 
+
+    """print(hyper)
+    print("done with hypernyms")
+    print(hypo)
+    print("done with hyponyms")
+    print(mero)
+    print("done with meronyms")
+    print(holo)
+    print("done with holonyms")
+
+    #print(lesk(sent))
+    print(pos_tag(word_tokenize(sent)))
+    print(pos_tag(word_tokenize(sent1)))
+    print("hi")
+    print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'trees','n'))
+    print(lesk(['The', 'kicthen', 'is', 'taller', 'than', 'buildings','.'], 'kitchen','n').part_holonyms())
+    print(wn.synset('tree.n.01'))
+    print(wn.synset('tree.n.01').part_meronyms())
+    print(wn.synset('kitchen.n.01').part_meronyms())
+    print(lesk(['I', 'went', 'to', 'the','river', 'bank', 'to', 'take', 'water', '.'], 'bank','n'))
+    print(lesk(['I', 'can', 'open', 'the','can','.'], 'can','v'))
+    print("hi")"""
+    # > ['The', 'striped', 'bats', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'best']
+
+
+    #TA testing tokenize, lemma, pos, dep-parse 
+    #this following needs to be uncommented
+     
+    """nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
+    sentTest = "Once converted, BayStar will own an aggregate of approximately 2.95 million shares of SCO common stock or 17.5 percent of the company's outstanding shares."
+    sentTest = re.sub(r'["\']', '', sentTest)
+    print(sentTest)
+    sentTest1 = "John said he is going home"
+    sentTest2 = "John said I am going to home"
 
-    for corpusParah in corpusObject.corpus:
-        doc1 = nlp(corpusParah.hm1["sent"])
-        doc2 = nlp(corpusParah.hm2["sent"])
+    nlpPipeLine.createDepParse(nlp, sentTest)
+    nlpPipeLine.createDepParse(nlp, sentTest1)
+    nlpPipeLine.createDepParse(nlp, sentTest2)"""
 
-        corpusParah.hm1["doc"] = doc1
-        corpusParah.hm2["doc"] = doc2
+    """sentTest = "TA user input sentence"
+    print('-printing all tokens-')
+    nlpPipeLine.createTokens(nlp,sentTest)
 
-    corpusParah1 = corpusObject.corpus[0]
+    print('-printing each lemma-')
+    nlpPipeLine.createLemma(nlp, sentTest)
+
+    print('-printing each POS tag-')
+    nlpPipeLine.createPOS(nlp, sentTest)
+
+    print('-printing all Dependency parse tree-')
+    nlpPipeLine.createDepParse(nlp,sentTest)"""
+
+    #'lemmas' have antonyms
+    #'synsets' have hypernyms, hyponyms, meornyms
+
+    data_folder_train = Path("data/train-set.txt")
+    trainCorpusObject = CorpusReader(data_folder_train)
+
+    data_folder_test = Path("data/dev-set.txt")
+    devCorpusObject = CorpusReader(data_folder_test)
+
+    #testCorpusObject = None
+
+    #0.8875103391232424 dev - train
+
+    mlObject = MachineLearningTasks(trainCorpusObject, devCorpusObject)
+
+    #do the nlp pipeline for each parah in corpusObject
+    #store in the appropriate HashMap dict
+    """a = 0
+    for corpusParah in trainCorpusObject.corpus:
+        #doc1 = nlp(corpusParah.hm1["sent"])
+        #doc2 = nlp(corpusParah.hm2["sent"])
+        if(a==2):
+            break
+        hyper, hypo, mero, holo = nlpPipeLine.createAllNyms(corpusParah.hm1["sent"])
+        corpusParah.hm1["hyper"] = hyper
+        corpusParah.hm1["hypo"] = hypo
+        corpusParah.hm1["mero"] = mero
+        corpusParah.hm1["holo"] = holo
+
+        hyper, hypo, mero, holo = nlpPipeLine.createAllNyms(corpusParah.hm2["sent"])
+        corpusParah.hm2["hyper"] = hyper
+        corpusParah.hm2["hypo"] = hypo
+        corpusParah.hm2["mero"] = mero
+        corpusParah.hm2["holo"] = holo
+
+        #corpusParah.hm1["doc"] = doc1
+        #corpusParah.hm2["doc"] = doc2
+        a = a+1"""
+
+    """corpusParah1 = corpusObject.corpus[0]
+    print(corpusParah1.hm1["sent"])
+    doc1 = corpusParah1.hm1["hyper"]
+    doc2 = corpusParah1.hm1["hypo"]
+    doc3 = corpusParah1.hm1["mero"]
+    doc4 = corpusParah1.hm1["holo"]
+
+    print(doc1)
+    print(doc2)
+    print(doc3)
+    print(doc4)"""
+
+    """corpusParah1 = corpusObject.corpus[0]
 
     doc1 = corpusParah1.hm1["doc"]
     doc2 = corpusParah1.hm2["doc"]
 
     for token in doc1:
+        print(token)"""
+
+    """for token in doc1:
         print(token.text, token.lemma_, token.pos_, )
 
     for token in doc2:
-        print(token.text, token.lemma_, token.pos_, )
+        print(token.text, token.lemma_, token.pos_, )"""
