@@ -91,6 +91,21 @@ class NlpPipeline:
 if __name__ == "__main__":
     print("starting now...")
 
+    file = open("data/prediction.txt", 'w')
+    file.write("id	Gold Tag\n")
+    linenum = 0
+    index =0
+    for x in range(90):
+        # rd = randint(1,5)
+        # sum = sum + abs(float(corpusParah.score) - float(devVal[index]))
+        # sum2 = sum2 + abs(float(corpusParah.score) - float(rd))
+        # print(corpusParah.score + " " + devVal[index])
+        newLine = "s_" + str(linenum) + " " + str(index)
+        file.write(newLine+"\n")
+        linenum = linenum + 1
+        index = index + 1
+        #print("hi")
+    file.close()
     """extractFeatures = ExtractFeatures()
 
     #cosine similarities
