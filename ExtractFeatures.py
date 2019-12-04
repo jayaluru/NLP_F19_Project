@@ -1,5 +1,4 @@
 import difflib
-import spacy
 import nltk as dist
 from nltk import word_tokenize
 from nltk import pos_tag
@@ -96,7 +95,6 @@ class ExtractFeatures:
 
     def spacySimilarities(self, corpusObject):
         print('doing spacySimilarities')
-        nlp = spacy.load("en_core_web_md")
         lemmaSet1 = set()
         lemmaSet2 = set()
         nsubj1 = set()
@@ -117,8 +115,8 @@ class ExtractFeatures:
             print(index)
             sent1 = corpusParah.hm1["sent"]
             sent2 = corpusParah.hm2["sent"]
-            doc1 = nlp(sent1)
-            doc2 = nlp(sent2)
+            doc1 = corpusParah.hm1["doc"]
+            doc2 = corpusParah.hm2["doc"]
 
             for token in doc1:
                 lemmaSet1.add(token.lemma_)
