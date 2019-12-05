@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
 from random import randint
 import spacy
+import pickle as pk
 
 
 
@@ -28,9 +29,14 @@ class MachineLearningTasks:
         randForest = rf(n_estimators=201, n_jobs=2, random_state=0)
         supportvm = svm.SVC(decision_function_shape='ovo')
         adaboostClassifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),n_estimators=200)
+        rfp = pk.dumps(randForest)
+        sp = pk.dumps(supportvm)
+        ap = pk.dumps(adaboostClassifier)
+
         randForest.fit(dfTrain, dfClass)
         supportvm.fit(dfTrain,dfClass)
         adaboostClassifier.fit(dfTrain,dfClass)
+
         devrandForest = []
         devsupportvm = []
         devaDaboost = []
@@ -96,23 +102,34 @@ class MachineLearningTasks:
             index = index + 1
 
         return corpusObject
+    def lemmaString(self, lemmaset):
+        outString = ""
+        index = 0
+        for val in lemmaset:
+            if(index == len(lemmaset)):
+                outString = outString + val
+            else:
+                outString = outString + val + " "
+        return outString
+
 
     def createDF(self, corpusObject):
-        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist', 'cs'])
+        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist', 'cs', 'bigram', 'trigram'])
         #df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'cs'])
         index = 0
         efObject = ef()
         lemmaDist, nsubjDist, pobjDist, dobjDist = efObject.spacySimilarities(corpusObject)
         print('extracting features')
         for corpusParah in corpusObject.corpus:
-            sent1 = corpusParah.hm1["sent"]
-            sent2 = corpusParah.hm2["sent"]
+            sent1 = self.lemmaString(corpusParah.hm1["lemmaset"])
+            sent2 = self.lemmaString(corpusParah.hm2["lemmaset"])
             ls = efObject.longestSubsequence(sent1, sent2)
-            js = efObject.jaccardSimilarity(sent1, sent2)
+            js = efObject.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
             ld = efObject.lavenshteinDistance(sent1, sent2)
             cs = efObject.cosineSimilarities(sent1, sent2)
             npos, vpos, apos, rpos = efObject.posFeatures(sent1, sent2)
-            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index], cs]
+            bigram, trigram = efObject.nGramOverlap(sent1, sent2)
+            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index], cs, bigram, trigram]
             #df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], cs]
             index = index + 1
         print(df.head())
@@ -120,6 +137,7 @@ class MachineLearningTasks:
 
 
     def maxNumber(self,num1,num2,num3):
+        return (int)(((int) (num1) + (int) (num2) + (int) (num3))/3)
         if num1==num2:
             return num1
         elif num2==num3:

@@ -130,7 +130,7 @@ class ExtractFeatures:
                 if(token.dep_ == 'dobj'):
                     dobj2.add(token.lemma_)
 
-            lemmaDist.append(self.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])**4)
+            lemmaDist.append(self.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"]))
             nsubjDist.append(self.jaccardDistance(nsubj1, nsubj2))
 
             pobjDist.append(self.jaccardDistance(pobj1, pobj2))
@@ -138,3 +138,43 @@ class ExtractFeatures:
             index = index + 1
         print('done with spacySimilarities')
         return lemmaDist, nsubjDist, pobjDist, dobjDist
+
+    def nGramOverlap(self, sentence1, sentence2):
+        tokens1 = sentence1.split(" ");
+        tokens2 = sentence2.split(" ")
+        bigramSet1 = set();
+        bigramSet2 = set()
+        for index in range(len(tokens1) - 1):
+            temp = tokens1[index] + " " + tokens1[index + 1]
+            bigramSet1.add(temp)
+
+        for index in range(len(tokens2) - 1):
+            temp = tokens2[index] + " " + tokens2[index + 1]
+            bigramSet2.add(temp)
+
+        intersectionLengthBigram = len(bigramSet1.intersection(bigramSet2))
+        if (intersectionLengthBigram == 0):
+            biGramScore = 0
+        else:
+            biGramSum = (len(bigramSet1) / intersectionLengthBigram) + (len(bigramSet2) / intersectionLengthBigram)
+            biGramScore = (2 * (1 / biGramSum))
+
+        triGramSet1 = set();
+        triGramSet2 = set()
+        for index in range(len(tokens1) - 2):
+            temp = tokens1[index] + " " + tokens1[index + 1] + " " + tokens1[index + 2]
+            triGramSet1.add(temp)
+
+        for index in range(len(tokens2) - 2):
+            temp = tokens2[index] + " " + tokens2[index + 1] + " " + tokens2[index + 2]
+            triGramSet2.add(temp)
+
+        intersectionLengthTriGram = len(triGramSet1.intersection(triGramSet2))
+
+        if(intersectionLengthTriGram == 0):
+            triGramScore = 0
+        else:
+            triGramSum = (len(triGramSet1) / intersectionLengthTriGram) + (len(triGramSet2) / intersectionLengthTriGram)
+            triGramScore = (2 * (1 / triGramSum))
+
+        return biGramScore, triGramScore
