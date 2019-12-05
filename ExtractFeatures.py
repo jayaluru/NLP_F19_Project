@@ -31,11 +31,57 @@ class ExtractFeatures:
         'VBZ': 'v'
     }
 
-    def longestSubsequence(self, string1, string2):
-        #print('doing longestSubsequence')
-        s = difflib.SequenceMatcher(isjunk=None, a=string1, b=string2)
-        temp = (s.find_longest_match(0,len(string1),0,len(string2))[2])
-        return temp/(len(string1)+len(string2))
+    def longestSubsequence(self, stringSet1, stringSet2):
+
+        s = difflib.SequenceMatcher(isjunk=None, a=stringSet1, b=stringSet2)
+        temp = (s.find_longest_match(0, len(stringSet1), 0, len(stringSet2))[2])
+        return temp / (len(stringSet1) + len(stringSet2))
+
+        if(len(stringSet1.union(stringSet2)) >222):
+            return -1
+
+        hm = {}
+        char = 33
+        string1 = ""
+        string2 = ""
+        for word in stringSet1:
+            if not word in hm:
+                hm[word] = (chr(char))
+            string1 = string1 + hm[word]
+            char = char + 1
+
+        for word in stringSet2:
+            if not word in hm:
+                hm[word] = (chr(char))
+            string2 = string2 + hm[word]
+            char = char + 1
+
+        return (self.lcs(string1, string2)/len(string1+string2))
+
+    #taken from lcs problem of geeksforgeeks
+    def lcs(self, X, Y):
+        # find the length of the strings
+        m = len(X)
+        n = len(Y)
+
+        # declaring the array for storing the dp values
+        L = [[None] * (n + 1) for i in range(m + 1)]
+
+        """Following steps build L[m + 1][n + 1] in bottom up fashion 
+        Note: L[i][j] contains length of LCS of X[0..i-1] 
+        and Y[0..j-1]"""
+        for i in range(m + 1):
+            for j in range(n + 1):
+                if i == 0 or j == 0:
+                    L[i][j] = 0
+                elif X[i - 1] == Y[j - 1]:
+                    L[i][j] = L[i - 1][j - 1] + 1
+                else:
+                    L[i][j] = max(L[i - 1][j], L[i][j - 1])
+
+                    # L[m][n] contains the length of LCS of X[0..n-1] & Y[0..m-1]
+        return L[m][n]
+        # end of function lcs
 
     def jaccardDistance(self, stringSet1, stringSet2):
         #dist.jaccard_distance()
@@ -47,10 +93,34 @@ class ExtractFeatures:
         #print('doing jaccardSimilarity')
         return self.jaccardDistance(set(word_tokenize(string1)), set(word_tokenize(string2)))
 
-    def lavenshteinDistance(self, string1, string2):
-        #print('doing lavenshteinDistance')
+    def lavenshteinDistance(self, doc1, lemmahash1, doc2, lemmahash2):
+
+        #handle strings len> 223
+
+        hm = {}
+        char = 33
+        string1 = ""
+        string2 = ""
+        for token in doc1:
+            if not lemmahash1[token.text] in hm:
+                hm[lemmahash1[token.text]] = (chr(char))
+            string1 = string1 + hm[lemmahash1[token.text]]
+            char = char + 1
+
+        for token in doc2:
+            if not lemmahash2[token.text] in hm:
+                hm[lemmahash2[token.text]] = (chr(char))
+            string2 = string2 + hm[lemmahash2[token.text]]
+            char = char + 1
+
+        #new return
         temp = dist.edit_distance(string1, string2, substitution_cost=1, transpositions=True)
         return temp / (len(string1) + len(string2))
+
+        #print('doing lavenshteinDistance')
+        #old return
+        temp = dist.edit_distance(stringSet1, stringSet2, substitution_cost=1, transpositions=True)
+        return temp / (len(stringSet1) + len(stringSet2))
     
     def posFeatures(self, string1, string2):
         #print('doing posFeatures')
@@ -96,14 +166,7 @@ class ExtractFeatures:
     def spacySimilarities(self, corpusObject):
         print('doing spacySimilarities')
 
-        nsubj1 = set()
-        nsubj2 = set()
 
-        pobj1 = set()
-        pobj2 = set()
-
-        dobj1 = set()
-        dobj2 = set()
 
         lemmaDist = []
         nsubjDist = []
@@ -113,6 +176,14 @@ class ExtractFeatures:
         for corpusParah in corpusObject.corpus:
             doc1 = corpusParah.hm1["doc"]
             doc2 = corpusParah.hm2["doc"]
+            nsubj1 = set()
+            nsubj2 = set()
+
+            pobj1 = set()
+            pobj2 = set()
+
+            dobj1 = set()
+            dobj2 = set()
 
             for token in doc1:
                 if(token.dep_ == 'nsubj'):
@@ -139,9 +210,15 @@ class ExtractFeatures:
         print('done with spacySimilarities')
         return lemmaDist, nsubjDist, pobjDist, dobjDist
 
-    def nGramOverlap(self, sentence1, sentence2):
-        tokens1 = sentence1.split(" ");
-        tokens2 = sentence2.split(" ")
+    def nGramOverlap(self, doc1, doc2):
+        tokens1 = list();
+        tokens2 = list();
+        for token in doc1:
+            tokens1.append(token.lemma_)
+
+        for token in doc2:
+            tokens2.append(token.lemma_)
+
         bigramSet1 = set();
         bigramSet2 = set()
         for index in range(len(tokens1) - 1):

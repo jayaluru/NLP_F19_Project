@@ -29,6 +29,7 @@ class MachineLearningTasks:
         randForest = rf(n_estimators=201, n_jobs=2, random_state=0)
         supportvm = svm.SVC(decision_function_shape='ovo')
         adaboostClassifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),n_estimators=200)
+
         rfp = pk.dumps(randForest)
         sp = pk.dumps(supportvm)
         ap = pk.dumps(adaboostClassifier)
@@ -82,6 +83,12 @@ class MachineLearningTasks:
             lemmaSet.add(token.lemma_)
         return lemmaSet
 
+    def addLemmaHash(self, doc):
+        lemmahash = {}
+        for token in doc:
+            lemmahash[token.text] = token.lemma_
+        return lemmahash
+
     def addSpacyDoc(self, corpusObject):
         print('creating "doc" from spacy')
 
@@ -94,22 +101,29 @@ class MachineLearningTasks:
             doc2 = self.nlp(sent2)
             corpusParah.hm1["doc"] = doc1
             lemmaset = self.addLemmaList(doc1)
+            lemmahash = self.addLemmaHash(doc1)
             corpusParah.hm1["lemmaset"] = lemmaset
+            corpusParah.hm1["lemmahash"] = lemmahash
 
             corpusParah.hm2["doc"] = doc2
             lemmaset = self.addLemmaList(doc2)
+            lemmahash = self.addLemmaHash(doc2)
             corpusParah.hm2["lemmaset"] = lemmaset
+            corpusParah.hm2["lemmahash"] = lemmahash
             index = index + 1
 
         return corpusObject
-    def lemmaString(self, lemmaset):
+
+    def lemmaString(self, doc):
         outString = ""
         index = 0
-        for val in lemmaset:
-            if(index == len(lemmaset)):
-                outString = outString + val
+        for token in doc:
+            if (index == len(doc)):
+                outString = outString + token.lemma_
             else:
-                outString = outString + val + " "
+                outString = outString + token.lemma_ + " "
+            #print(token.text,token.lemma_)
+        print (outString)
         return outString
 
 
@@ -121,14 +135,16 @@ class MachineLearningTasks:
         lemmaDist, nsubjDist, pobjDist, dobjDist = efObject.spacySimilarities(corpusObject)
         print('extracting features')
         for corpusParah in corpusObject.corpus:
-            sent1 = self.lemmaString(corpusParah.hm1["lemmaset"])
-            sent2 = self.lemmaString(corpusParah.hm2["lemmaset"])
+            sent1 = self.lemmaString(corpusParah.hm1["doc"])
+            sent2 = self.lemmaString(corpusParah.hm2["doc"])
+            #ls = efObject.longestSubsequence(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
             ls = efObject.longestSubsequence(sent1, sent2)
             js = efObject.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
-            ld = efObject.lavenshteinDistance(sent1, sent2)
+            #ld = efObject.lavenshteinDistance(sent1, sent2)
+            ld = efObject.lavenshteinDistance(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
             cs = efObject.cosineSimilarities(sent1, sent2)
             npos, vpos, apos, rpos = efObject.posFeatures(sent1, sent2)
-            bigram, trigram = efObject.nGramOverlap(sent1, sent2)
+            bigram, trigram = efObject.nGramOverlap(corpusParah.hm1["doc"], corpusParah.hm2["doc"])
             df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index], cs, bigram, trigram]
             #df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], cs]
             index = index + 1
@@ -137,7 +153,7 @@ class MachineLearningTasks:
 
 
     def maxNumber(self,num1,num2,num3):
-        return (int)(((int) (num1) + (int) (num2) + (int) (num3))/3)
+        #return (int)(((int) (num1) + (int) (num2) + (int) (num3))/3)
         if num1==num2:
             return num1
         elif num2==num3:
