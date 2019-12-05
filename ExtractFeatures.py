@@ -31,29 +31,30 @@ class ExtractFeatures:
         'VBZ': 'v'
     }
 
-    def longestSubsequence(self, stringSet1, stringSet2):
+    def longestSubsequence(self, doc1, lemmahash1, doc2, lemmahash2):
 
-        s = difflib.SequenceMatcher(isjunk=None, a=stringSet1, b=stringSet2)
+        """s = difflib.SequenceMatcher(isjunk=None, a=stringSet1, b=stringSet2)
         temp = (s.find_longest_match(0, len(stringSet1), 0, len(stringSet2))[2])
-        return temp / (len(stringSet1) + len(stringSet2))
+        return temp / (len(stringSet1) + len(stringSet2))"""
 
-        if(len(stringSet1.union(stringSet2)) >222):
-            return -1
+        # handle len> 223
+        #if(len(stringSet1.union(stringSet2)) >222):
+        #    return -1
 
         hm = {}
         char = 33
         string1 = ""
         string2 = ""
-        for word in stringSet1:
-            if not word in hm:
-                hm[word] = (chr(char))
-            string1 = string1 + hm[word]
+        for token in doc1:
+            if not lemmahash1[token.text] in hm:
+                hm[lemmahash1[token.text]] = (chr(char))
+            string1 = string1 + hm[lemmahash1[token.text]]
             char = char + 1
 
-        for word in stringSet2:
-            if not word in hm:
-                hm[word] = (chr(char))
-            string2 = string2 + hm[word]
+        for token in doc2:
+            if not lemmahash2[token.text] in hm:
+                hm[lemmahash2[token.text]] = (chr(char))
+            string2 = string2 + hm[lemmahash2[token.text]]
             char = char + 1
 
         return (self.lcs(string1, string2)/len(string1+string2))

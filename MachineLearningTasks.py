@@ -138,7 +138,7 @@ class MachineLearningTasks:
             sent1 = self.lemmaString(corpusParah.hm1["doc"])
             sent2 = self.lemmaString(corpusParah.hm2["doc"])
             #ls = efObject.longestSubsequence(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
-            ls = efObject.longestSubsequence(sent1, sent2)
+            ls = efObject.longestSubsequence(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
             js = efObject.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
             #ld = efObject.lavenshteinDistance(sent1, sent2)
             ld = efObject.lavenshteinDistance(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
