@@ -143,8 +143,8 @@ class MachineLearningTasks:
             #ld = efObject.lavenshteinDistance(sent1, sent2)
             ld = efObject.lavenshteinDistance(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
             cs = efObject.cosineSimilarities(sent1, sent2)
-            npos, vpos, apos, rpos = efObject.posFeatures(corpusParah.hm1["doc"], corpusParah.hm2["doc"])
-            bigram, trigram = efObject.nGramOverlap(sent1, sent2)
+            npos, vpos, apos, rpos = efObject.posFeatures(sent1, sent2)
+            bigram, trigram = efObject.nGramOverlap(corpusParah.hm1["doc"], corpusParah.hm2["doc"])
             df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index], cs, bigram, trigram]
             #df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], cs]
             index = index + 1

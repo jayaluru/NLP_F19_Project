@@ -210,9 +210,15 @@ class ExtractFeatures:
         print('done with spacySimilarities')
         return lemmaDist, nsubjDist, pobjDist, dobjDist
 
-    def nGramOverlap(self, sentence1, sentence2):
-        tokens1 = sentence1.split(" ");
-        tokens2 = sentence2.split(" ")
+    def nGramOverlap(self, doc1, doc2):
+        tokens1 = list();
+        tokens2 = list();
+        for token in doc1:
+            tokens1.append(token.lemma_)
+
+        for token in doc2:
+            tokens2.append(token.lemma_)
+
         bigramSet1 = set();
         bigramSet2 = set()
         for index in range(len(tokens1) - 1):
