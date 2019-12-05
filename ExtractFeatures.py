@@ -95,8 +95,7 @@ class ExtractFeatures:
 
     def spacySimilarities(self, corpusObject):
         print('doing spacySimilarities')
-        lemmaSet1 = set()
-        lemmaSet2 = set()
+
         nsubj1 = set()
         nsubj2 = set()
 
@@ -112,14 +111,10 @@ class ExtractFeatures:
         dobjDist = []
         index = 0
         for corpusParah in corpusObject.corpus:
-            print(index)
-            sent1 = corpusParah.hm1["sent"]
-            sent2 = corpusParah.hm2["sent"]
             doc1 = corpusParah.hm1["doc"]
             doc2 = corpusParah.hm2["doc"]
 
             for token in doc1:
-                lemmaSet1.add(token.lemma_)
                 if(token.dep_ == 'nsubj'):
                     nsubj1.add(token.lemma_)
                 if(token.dep_ == 'pobj'):
@@ -128,7 +123,6 @@ class ExtractFeatures:
                     dobj1.add(token.lemma_)
 
             for token in doc2:
-                lemmaSet2.add(token.lemma_)
                 if(token.dep_ == 'nsubj'):
                     nsubj2.add(token.lemma_)
                 if(token.dep_ == 'pobj'):
@@ -136,10 +130,11 @@ class ExtractFeatures:
                 if(token.dep_ == 'dobj'):
                     dobj2.add(token.lemma_)
 
-            lemmaDist.append(self.jaccardDistance(lemmaSet1, lemmaSet2)**4)
+            lemmaDist.append(self.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])**4)
             nsubjDist.append(self.jaccardDistance(nsubj1, nsubj2))
 
             pobjDist.append(self.jaccardDistance(pobj1, pobj2))
             dobjDist.append(self.jaccardDistance(dobj1, dobj2))
             index = index + 1
+        print('done with spacySimilarities')
         return lemmaDist, nsubjDist, pobjDist, dobjDist

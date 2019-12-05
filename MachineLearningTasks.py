@@ -11,6 +11,7 @@ import spacy
 
 
 class MachineLearningTasks:
+    nlp = spacy.load("en_core_web_md")
 
     def __init__(self, trainCorpusObject, devCorpusObject):
 
@@ -69,25 +70,32 @@ class MachineLearningTasks:
             index = index + 1
         file.close()
 
-
-
-        #print(sum/1209)
-        #print(sum2/1209)
+    def addLemmaList(self, doc):
+        lemmaSet = set()
+        for token in doc:
+            lemmaSet.add(token.lemma_)
+        return lemmaSet
 
     def addSpacyDoc(self, corpusObject):
         print('creating "doc" from spacy')
-        nlp = spacy.load("en_core_web_md")
-        index = 0
 
+        index = 0
         for corpusParah in corpusObject.corpus:
             print(index)
             sent1 = corpusParah.hm1["sent"]
             sent2 = corpusParah.hm2["sent"]
-            doc1 = nlp(sent1)
-            doc2 = nlp(sent2)
+            doc1 = self.nlp(sent1)
+            doc2 = self.nlp(sent2)
             corpusParah.hm1["doc"] = doc1
+            lemmaset = self.addLemmaList(doc1)
+            corpusParah.hm1["lemmaset"] = lemmaset
+
             corpusParah.hm2["doc"] = doc2
-            index = index +1
+            lemmaset = self.addLemmaList(doc2)
+            corpusParah.hm2["lemmaset"] = lemmaset
+            index = index + 1
+
+        return corpusObject
 
     def createDF(self, corpusObject):
         df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist', 'cs'])
