@@ -2,6 +2,7 @@ import difflib
 import nltk as dist
 from nltk import word_tokenize
 from nltk import pos_tag
+from nltk.wsd import lesk
 from nltk.corpus import stopwords
 import sklearn.metrics.pairwise as sk
 import numpy as np
@@ -32,14 +33,6 @@ class ExtractFeatures:
     }
 
     def longestSubsequence(self, doc1, lemmahash1, doc2, lemmahash2):
-
-        """s = difflib.SequenceMatcher(isjunk=None, a=stringSet1, b=stringSet2)
-        temp = (s.find_longest_match(0, len(stringSet1), 0, len(stringSet2))[2])
-        return temp / (len(stringSet1) + len(stringSet2))"""
-
-        # handle len> 223
-        #if(len(stringSet1.union(stringSet2)) >222):
-        #    return -1
 
         hm = {}
         char = 33
@@ -96,8 +89,6 @@ class ExtractFeatures:
 
     def lavenshteinDistance(self, doc1, lemmahash1, doc2, lemmahash2):
 
-        #handle strings len> 223
-
         hm = {}
         char = 33
         string1 = ""
@@ -118,10 +109,6 @@ class ExtractFeatures:
         temp = dist.edit_distance(string1, string2, substitution_cost=1, transpositions=True)
         return temp / (len(string1) + len(string2))
 
-        #print('doing lavenshteinDistance')
-        #old return
-        temp = dist.edit_distance(stringSet1, stringSet2, substitution_cost=1, transpositions=True)
-        return temp / (len(stringSet1) + len(stringSet2))
     
     def posFeatures(self, string1, string2):
         #print('doing posFeatures')
@@ -146,8 +133,6 @@ class ExtractFeatures:
                 if (self.wordnet_tag_map[val[1]] == pos):
                     newStringSet2.add(val[0])
 
-        #print(newStringSet1)
-        #print(newStringSet2)
         return self.jaccardDistance(newStringSet1, newStringSet2)
 
     #code is imported from 'https://towardsdatascience.com/overview-of-text-similarity-metrics-3397c4601f50'
@@ -166,9 +151,6 @@ class ExtractFeatures:
 
     def spacySimilarities(self, corpusObject):
         print('doing spacySimilarities')
-
-
-
         lemmaDist = []
         nsubjDist = []
         pobjDist = []
@@ -256,3 +238,125 @@ class ExtractFeatures:
             triGramScore = (2 * (1 / triGramSum))
 
         return biGramScore, triGramScore
+
+    def wordSimilarity(self, corpusObject):
+        nsubSimilarity = list();
+        pobjSimilarity = list();
+        dobjSimilarity = list();
+
+        for corpusParah in corpusObject.corpus:
+
+            doc1 = corpusParah.hm1["doc"];
+            doc2 = corpusParah.hm2["doc"]
+            wordTokens1 = word_tokenize(corpusParah.hm1["sent"])
+            pos1 = pos_tag(wordTokens1)
+
+            index = 0;
+            synsetDict1 = {};
+            for tokenOrig in wordTokens1:
+
+                if tokenOrig not in synsetDict1:
+                    if (pos1[index][1] in self.wordnet_tag_map):
+                        token = lesk(wordTokens1, tokenOrig, self.wordnet_tag_map[pos1[index][1]])
+                    else:
+                        token = lesk(wordTokens1, tokenOrig)
+
+                    synsetDict1[tokenOrig] = token
+
+                index = index + 1
+
+            index = 0;
+            synsetDict2 = {};
+            wordTokens2 = word_tokenize(corpusParah.hm2["sent"])
+            pos2 = pos_tag(wordTokens2)
+
+            for tokenOrig in wordTokens2:
+
+                if tokenOrig not in synsetDict2:
+                    if (pos2[index][1] in self.wordnet_tag_map):
+                        token = lesk(wordTokens2, tokenOrig, self.wordnet_tag_map[pos2[index][1]])
+                    else:
+                        token = lesk(wordTokens2, tokenOrig)
+
+                    synsetDict2[tokenOrig] = token
+
+                index = index + 1
+
+            nsubj1 = set();
+            nsubj2 = set()
+
+            pobj1 = set();
+            pobj2 = set()
+
+            dobj1 = set();
+            dobj2 = set()
+
+            for token in doc1:
+                if (token.dep_ == 'nsubj'):
+                    nsubj1.add(token.text)
+                if (token.dep_ == 'pobj'):
+                    pobj1.add(token.text)
+                if (token.dep_ == 'dobj'):
+                    dobj1.add(token.text)
+
+            for token in doc2:
+                if (token.dep_ == 'nsubj'):
+                    nsubj2.add(token.text)
+                if (token.dep_ == 'pobj'):
+                    pobj2.add(token.text)
+                if (token.dep_ == 'dobj'):
+                    dobj2.add(token.text)
+
+            nsubdist = list()
+            for sub1 in nsubj1:
+                max = 0
+                for sub2 in nsubj2:
+                    if (sub1 in synsetDict1) and (sub2 in synsetDict2) and synsetDict1[sub1] and synsetDict2[sub2]:
+                        if synsetDict1[sub1].path_similarity(synsetDict2[sub2]) and synsetDict1[sub1].path_similarity(
+                                synsetDict2[sub2]) > max:
+                            max = synsetDict1[sub1].path_similarity(synsetDict2[sub2])
+
+                nsubdist.append(max)
+
+            pobjdist = list()
+            for pobj1 in pobj1:
+                max = 0
+                for pobj2 in pobj2:
+                    if (pobj1 in synsetDict1) and (pobj2 in synsetDict2) and synsetDict1[pobj1] and synsetDict2[pobj2]:
+                        if synsetDict1[pobj1].path_similarity(synsetDict2[pobj2]) and synsetDict1[
+                            pobj1].path_similarity(synsetDict2[pobj2]) > max:
+                            max = synsetDict1[pobj1].path_similarity(synsetDict2[pobj2])
+
+                pobjdist.append(max)
+
+            dobjdist = list()
+            for dobj1 in dobj1:
+                max = 0
+                for dobj2 in dobj1:
+                    if (dobj1 in synsetDict1) and (dobj2 in synsetDict2) and synsetDict1[dobj1] and synsetDict2[dobj2]:
+                        if synsetDict1[dobj1].path_similarity(synsetDict2[dobj2]) and synsetDict1[
+                            dobj1].path_similarity(synsetDict2[dobj2]) > max:
+                            max = synsetDict1[dobj1].path_similarity(synsetDict2[dobj2])
+
+                dobjdist.append(max)
+
+            if len(nsubdist) == 0:
+                nsubScore = -1
+            else:
+                nsubScore = sum(nsubdist) / len(nsubdist)
+
+            if len(pobjdist) == 0:
+                pobjScore = -1
+            else:
+                pobjScore = sum(pobjdist) / len(pobjdist)
+
+            if len(dobjdist) == 0:
+                dobjScore = -1
+            else:
+                dobjScore = sum(dobjdist) / len(dobjdist)
+
+            nsubSimilarity.append(nsubScore)
+            pobjSimilarity.append(pobjScore)
+            dobjSimilarity.append(dobjScore)
+
+        return nsubSimilarity, pobjSimilarity, dobjSimilarity

@@ -89,95 +89,31 @@ class NlpPipeline:
 
 
 if __name__ == "__main__":
-    print("starting now...")
-
-
-    """extractFeatures = ExtractFeatures()
-
-    #cosine similarities
-    print(extractFeatures.get_cosine_sim("hi hello how are you", "hi there"))
-
-    #longestSubsequence in a number
-    print(extractFeatures.longestSubsequence("hi hello how are you", "hi there"))
-
-    #jaccard distance calcuation
-    #keep in mind the input is 'set of words'
-    print(extractFeatures.jaccardDistance(set(word_tokenize("hi there")),set(word_tokenize("hi there"))))
-
-    #lavenshtein distance
-    print(extractFeatures.lavenshteinDistance("hi hello how are you", "hi there"))
-
-    syns = wn.synsets("the")
-    #print(syns)
-    sent = "the striped bats are hanging on their feet"
-    sent1 = "The kitchen is taller than buildings."
-    print(word_tokenize(sent))
-    print(pos_tag(word_tokenize(sent)))
-    print(set(pos_tag(word_tokenize(sent))))
-    print(set(pos_tag(word_tokenize(sent1))))
-    #extractFeatures.posOverlapJaccard(set(pos_tag(word_tokenize(sent))),set(pos_tag(word_tokenize(sent))), 'n')
-    print(extractFeatures.posFeatures(sent, sent1))
-    print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'The','s'))
-    print(lesk(['Nand', 'will', 'start', 'playing', 'game','.'], 'Nand','n'))"""
-
-
-
-
-    """print(hyper)
-    print("done with hypernyms")
-    print(hypo)
-    print("done with hyponyms")
-    print(mero)
-    print("done with meronyms")
-    print(holo)
-    print("done with holonyms")
-
-    #print(lesk(sent))
-    print(pos_tag(word_tokenize(sent)))
-    print(pos_tag(word_tokenize(sent1)))
-    print("hi")
-    print(lesk(['The', 'striped', 'trees', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'game','.'], 'trees','n'))
-    print(lesk(['The', 'kicthen', 'is', 'taller', 'than', 'buildings','.'], 'kitchen','n').part_holonyms())
-    print(wn.synset('tree.n.01'))
-    print(wn.synset('tree.n.01').part_meronyms())
-    print(wn.synset('kitchen.n.01').part_meronyms())
-    print(lesk(['I', 'went', 'to', 'the','river', 'bank', 'to', 'take', 'water', '.'], 'bank','n'))
-    print(lesk(['I', 'can', 'open', 'the','can','.'], 'can','v'))
-    print("hi")"""
-    # > ['The', 'striped', 'bats', 'are', 'hanging', 'on', 'their', 'feet', 'for', 'best']
-
+    print("starting now. loading spacy")
 
     #TA testing tokenize, lemma, pos, dep-parse 
     #this following needs to be uncommented
-     
+
     """nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
-    sentTest = "Once converted, BayStar will own an aggregate of approximately 2.95 million shares of SCO common stock or 17.5 percent of the company's outstanding shares."
-    sentTest = re.sub(r'["\']', '', sentTest)
-    print(sentTest)
-    sentTest1 = "John said he is going home"
-    sentTest2 = "John said I am going to home"
-
-    nlpPipeLine.createDepParse(nlp, sentTest)
-    nlpPipeLine.createDepParse(nlp, sentTest1)
-    nlpPipeLine.createDepParse(nlp, sentTest2)"""
-
-    """sentTest = "TA user input sentence"
+    sentTest = "TA user input sentence"
+    print('')
     print('-printing all tokens-')
     nlpPipeLine.createTokens(nlp,sentTest)
 
+    print('')
     print('-printing each lemma-')
     nlpPipeLine.createLemma(nlp, sentTest)
 
+    print('')
     print('-printing each POS tag-')
     nlpPipeLine.createPOS(nlp, sentTest)
 
+    print('')
     print('-printing all Dependency parse tree-')
     nlpPipeLine.createDepParse(nlp,sentTest)"""
 
-    #'lemmas' have antonyms
-    #'synsets' have hypernyms, hyponyms, meornyms
 
     data_folder_train = Path("data/train-set.txt")
     trainCorpusObject = CorpusReader(data_folder_train)
@@ -185,14 +121,12 @@ if __name__ == "__main__":
     data_folder_test = Path("data/dev-set.txt")
     devCorpusObject = CorpusReader(data_folder_test)
 
-    #testCorpusObject = None
-
-    #0.8875103391232424 dev - train
 
     mlObject = MachineLearningTasks(trainCorpusObject, devCorpusObject)
 
     #do the nlp pipeline for each parah in corpusObject
     #store in the appropriate HashMap dict
+
     """a = 0
     for corpusParah in trainCorpusObject.corpus:
         #doc1 = nlp(corpusParah.hm1["sent"])
