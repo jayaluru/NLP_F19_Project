@@ -57,7 +57,8 @@ class MachineLearningTasks:
         file = open("data/prediction.txt", 'w+')
         file.write("id	Gold Tag\n")
         for corpusParah in devCorpusObject.corpus:
-            print(corpusParah.score + " " + devrandForest[index] + " " + devsupportvm[index] + " " + devaDaboost[index])
+            curind = index + 1
+            print((str)(curind) + " " + corpusParah.score + " " + devrandForest[index] + " " + devsupportvm[index] + " " + devaDaboost[index])
             newLine = "s_" + str(linenum) + "\t" + str(self.maxNumber(devrandForest[index],devsupportvm[index],devaDaboost[index]))
             if(linenum == len(devrandForest)):
                 file.write(newLine)
