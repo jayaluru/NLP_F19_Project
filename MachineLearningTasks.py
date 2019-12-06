@@ -1,11 +1,10 @@
-import csv
+
 import pandas as pd
 from ExtractFeatures import ExtractFeatures as ef
 from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
-from random import randint
 import spacy
 import pickle as pk
 
@@ -30,6 +29,7 @@ class MachineLearningTasks:
         supportvm = svm.SVC(decision_function_shape='ovo')
         adaboostClassifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),n_estimators=200)
 
+        #to save the models
         rfp = pk.dumps(randForest)
         sp = pk.dumps(supportvm)
         ap = pk.dumps(adaboostClassifier)
@@ -41,11 +41,9 @@ class MachineLearningTasks:
         devrandForest = []
         devsupportvm = []
         devaDaboost = []
-        #clf.predict(dfTest)
 
         for n in randForest.predict(dfTest):
             devrandForest.append(n)
-            #print(n)
 
         for prediction in supportvm.predict(dfTest):
             devsupportvm.append(prediction)
@@ -54,25 +52,17 @@ class MachineLearningTasks:
             devaDaboost.append(prediction)
 
 
-        devRel = []
         linenum = 1
         index = 0
-        #sum = 0
-        #sum2 = 0
-        #print("Original-Projected")
         file = open("data/prediction.txt", 'w+')
         file.write("id	Gold Tag\n")
         for corpusParah in devCorpusObject.corpus:
-            #rd = randint(1,5)
-            #sum = sum + abs(float(corpusParah.score) - float(devVal[index]))
-            #sum2 = sum2 + abs(float(corpusParah.score) - float(rd))
             print(corpusParah.score + " " + devrandForest[index] + " " + devsupportvm[index] + " " + devaDaboost[index])
             newLine = "s_" + str(linenum) + "\t" + str(self.maxNumber(devrandForest[index],devsupportvm[index],devaDaboost[index]))
             if(linenum == len(devrandForest)):
                 file.write(newLine)
             else:
                 file.write(newLine + "\n")
-            #print("hi")
             linenum = linenum + 1
             index = index + 1
         file.close()
@@ -122,38 +112,40 @@ class MachineLearningTasks:
                 outString = outString + token.lemma_
             else:
                 outString = outString + token.lemma_ + " "
-            #print(token.text,token.lemma_)
-        print (outString)
         return outString
 
 
     def createDF(self, corpusObject):
-        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'nsubjDist', 'pobjDist', 'dobjDist', 'cs', 'bigram', 'trigram'])
-        #df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist', 'cs'])
+        df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist',
+                                   'nsubjDist', 'pobjDist', 'dobjDist', 'cs', 'bigram', 'trigram',
+                                   'nsubSimilarity', 'pobjSimilarity', 'dobjSimilarity'])
+        """df = pd.DataFrame(columns=['ls', 'js', 'ld', 'npos', 'vpos', 'apos', 'rpos', 'lemmaDist',
+                                   'nsubjDist', 'pobjDist', 'dobjDist', 'cs', 'bigram', 'trigram'])"""
         index = 0
         efObject = ef()
         lemmaDist, nsubjDist, pobjDist, dobjDist = efObject.spacySimilarities(corpusObject)
+        nsubSimilarity, pobjSimilarity, dobjSimilarity = efObject.wordSimilarity(corpusObject)
         print('extracting features')
         for corpusParah in corpusObject.corpus:
             sent1 = self.lemmaString(corpusParah.hm1["doc"])
             sent2 = self.lemmaString(corpusParah.hm2["doc"])
-            #ls = efObject.longestSubsequence(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
             ls = efObject.longestSubsequence(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
             js = efObject.jaccardDistance(corpusParah.hm1["lemmaset"], corpusParah.hm2["lemmaset"])
-            #ld = efObject.lavenshteinDistance(sent1, sent2)
             ld = efObject.lavenshteinDistance(corpusParah.hm1["doc"], corpusParah.hm1["lemmahash"], corpusParah.hm2["doc"],  corpusParah.hm2["lemmahash"])
             cs = efObject.cosineSimilarities(sent1, sent2)
             npos, vpos, apos, rpos = efObject.posFeatures(sent1, sent2)
             bigram, trigram = efObject.nGramOverlap(corpusParah.hm1["doc"], corpusParah.hm2["doc"])
-            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index], pobjDist[index], dobjDist[index], cs, bigram, trigram]
-            #df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], cs]
+            df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index],
+                             pobjDist[index], dobjDist[index], cs, bigram, trigram,
+                             nsubSimilarity[index], pobjSimilarity[index], dobjSimilarity[index]]
+            """df.loc[index] = [ls, js, ld, npos, vpos, apos, rpos, lemmaDist[index], nsubjDist[index],
+                             pobjDist[index], dobjDist[index], cs, bigram, trigram]"""
             index = index + 1
         print(df.head())
         return df
 
 
     def maxNumber(self,num1,num2,num3):
-        #return (int)(((int) (num1) + (int) (num2) + (int) (num3))/3)
         if num1==num2:
             return num1
         elif num2==num3:
