@@ -94,7 +94,7 @@ if __name__ == "__main__":
     #TA testing tokenize, lemma, pos, dep-parse 
     #this following needs to be uncommented
 
-    """nlpPipeLine = NlpPipeline()
+    nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
     sentTest = "TA user input sentence"
@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     print('')
     print('-printing all Dependency parse tree-')
-    nlpPipeLine.createDepParse(nlp,sentTest)"""
+    nlpPipeLine.createDepParse(nlp,sentTest)
 
 
     data_folder_train = Path("data/train-set.txt")
