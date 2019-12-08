@@ -64,6 +64,10 @@ class NlpPipeline:
         holo = {}
 
         index = 0
+        hyperd = {}
+        hypod = {}
+        merod = {}
+        holod = {}
         for tokenOrig in wordTokens:
             #print(tokenOrig)
             if(pos[index][1] in self.wordnet_tag_map):
@@ -76,15 +80,39 @@ class NlpPipeline:
             hypo[token] = []
             mero[token] = []
             holo[token] = []
-            if (token):
-                if token.hypernyms():
-                    hyper[token] = token.hypernyms()
-                if token.hyponyms():
-                    hypo[token] = token.hyponyms()
-                mero[token] = token.part_meronyms()
-                holo[token] = token.part_holonyms()
 
-        return hyper, hypo, mero, holo
+            if (token):
+                print("")
+                print(tokenOrig)
+                print(token)
+                if token.hypernyms():
+                    #hyper.append(token.hypernyms())
+                    hyperd[token] = token.hypernyms()
+                    print("hypernyms")
+                    print(token.hypernyms())
+                    print("")
+                else:
+                    print("there are no hypernyms")
+                if token.hyponyms():
+                    #hypo[token] = token.hyponyms()
+                    hypod[token] = token.hyponyms()
+                    print("hyponyms")
+                    print(token.hyponyms())
+                    print("")
+                else:
+                    print("there are no hyponyms")
+                #mero[token] = token.part_meronyms()
+                merod[token] = token.part_meronyms()
+                print("meronyms")
+                print(token.part_meronyms())
+                print("")
+                #holo[token] = token.part_holonyms()
+                holod[token] = token.part_holonyms()
+                print("holonyms")
+                print(token.part_holonyms())
+                print("")
+
+        return hyperd, hypod, merod, holod
 
 
 
@@ -94,10 +122,12 @@ if __name__ == "__main__":
     #TA testing tokenize, lemma, pos, dep-parse 
     #this following needs to be uncommented
 
-    nlpPipeLine = NlpPipeline()
+    '''nlpPipeLine = NlpPipeline()
     nlp = spacy.load("en_core_web_md")
 
     sentTest = "TA user input sentence"
+    sentTest = "The secretariat is expected to run tomorrow"
+    print("start of task 2")
     print('')
     print('-printing all tokens-')
     nlpPipeLine.createTokens(nlp,sentTest)
@@ -114,11 +144,16 @@ if __name__ == "__main__":
     print('-printing all Dependency parse tree-')
     nlpPipeLine.createDepParse(nlp,sentTest)
 
+    print('')
+    print('-printing all Dependency parse tree-')
+    hyper, hypo, mero, holo = nlpPipeLine.createAllNyms(sentTest)
 
+
+    print("end of task 2")'''
     data_folder_train = Path("data/train-set.txt")
     trainCorpusObject = CorpusReader(data_folder_train)
 
-    data_folder_test = Path("data/dev-set.txt")
+    data_folder_test = Path("data/test-set.txt")
     devCorpusObject = CorpusReader(data_folder_test)
 
 

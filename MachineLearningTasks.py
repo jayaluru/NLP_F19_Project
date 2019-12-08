@@ -56,10 +56,16 @@ class MachineLearningTasks:
         index = 0
         file = open("data/prediction.txt", 'w+')
         file.write("id	Gold Tag\n")
+        sum = 0
+        acc = 0
         for corpusParah in devCorpusObject.corpus:
             curind = index + 1
-            print((str)(curind) + " " + corpusParah.score + " " + devrandForest[index] + " " + devsupportvm[index] + " " + devaDaboost[index])
-            newLine = "s_" + str(linenum) + "\t" + str(self.maxNumber(devrandForest[index],devsupportvm[index],devaDaboost[index]))
+            print((str)(curind) + " " + (str)(corpusParah.score) + " " + devrandForest[index] + " " + devsupportvm[index] + " " + devaDaboost[index])
+            temp = int(self.maxNumber(devrandForest[index],devsupportvm[index],devaDaboost[index]))
+            newLine = "s_" + str(linenum) + "\t" + str(temp)
+            sum = sum + abs(int(corpusParah.score) - temp)
+            if(int(corpusParah.score) == temp):
+                acc = acc + 1
             if(linenum == len(devrandForest)):
                 file.write(newLine)
             else:
@@ -67,6 +73,9 @@ class MachineLearningTasks:
             linenum = linenum + 1
             index = index + 1
         file.close()
+        print(sum/1209)
+        print(acc)
+
 
     def addLemmaList(self, doc):
         lemmaSet = set()
